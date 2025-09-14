@@ -8,10 +8,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 // Test route to confirm the server is running
+
 app.get('/', (req, res) => {
     res.send('Backend is running!');
 });
-
+app.use('/api', apiRoutes);
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
