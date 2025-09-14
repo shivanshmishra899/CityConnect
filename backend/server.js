@@ -7,6 +7,10 @@ require('dotenv').config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+// Test route to confirm the server is running
+app.get('/', (req, res) => {
+    res.send('Backend is running!');
+});
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -23,7 +27,7 @@ app.post('/api/signup', async (req, res) => {
     const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
     if (authError) return res.status(400).json({ error: authError.message });
     if (!authData.user) return res.status(500).json({ error: 'User not created' });
-    
+
     const user = authData.user;
 
     // Update user profile with full name
@@ -41,7 +45,7 @@ app.post('/api/signup', async (req, res) => {
         });
         if (staffError) return res.status(400).json({ error: staffError.message });
     } else {
-         const { error: userError } = await supabase.from('users').insert({
+        const { error: userError } = await supabase.from('users').insert({
             user_id: user.id,
             full_name: fullName,
             email: user.email
@@ -56,7 +60,7 @@ app.post('/api/signup', async (req, res) => {
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    
+
     if (error) return res.status(401).json({ error: error.message });
     res.status(200).json(data);
 });
@@ -75,7 +79,7 @@ app.get('/api/profile', async (req, res) => {
         .select('*')
         .eq('user_id', user.id)
         .single();
-        
+
     if (staffData) {
         res.json({ ...user, role: staffData.role, vehicle_number: staffData.vehicle_number });
     } else {
@@ -94,7 +98,7 @@ app.get('/api/buses', async (req, res) => {
 
 // 5. Get All Routes
 app.get('/api/routes', async (req, res) => {
-     const { data, error } = await supabase.from('routes').select('*');
+    const { data, error } = await supabase.from('routes').select('*');
     if (error) return res.status(500).json({ error: error.message });
     res.json(data);
 });
